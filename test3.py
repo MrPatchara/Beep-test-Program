@@ -99,9 +99,6 @@ class MSFTApp:
         self.distance_label = tk.Label(self.info_frame, text="Total Distance: 0.0 m", font=("Arial", 18))
         self.distance_label.pack()
 
-        self.countdown_label = tk.Label(self.info_frame, text="Get Ready: 10", font=("Arial", 18))
-        self.countdown_label.pack()
-
         # Control Frame
         self.control_frame = tk.Frame(self.main_frame)
         self.control_frame.grid(row=2, column=0, columnspan=2, pady=10, sticky="ew")
@@ -145,20 +142,33 @@ class MSFTApp:
         self.show_countdown(10)
 
     def show_countdown(self, seconds):
-        self.countdown_label.config(text=f"Get Ready: {seconds}")
-        self.root.update()
-        while seconds > 0:
+        countdown_window = tk.Toplevel(self.root)
+        countdown_window.title("Get Ready!")
+        countdown_window.geometry("300x200")
+        countdown_window.attributes("-topmost", True)
+
+        label = tk.Label(countdown_window, text=f"Get Ready!", font=("Arial", 24))
+        label.pack(expand=True)
+
+        time_label = tk.Label(countdown_window, text=f"{seconds}", font=("Arial", 48))
+        time_label.pack(expand=True)
+
+        def update_countdown():
+            nonlocal seconds
+            while seconds > 0:
+                time_label.config(text=f"{seconds}")
+                countdown_window.update()
+                time.sleep(1)
+                seconds -= 1
+            time_label.config(text="Go!")
+            countdown_window.update()
             time.sleep(1)
-            seconds -= 1
-            self.countdown_label.config(text=f"Get Ready: {seconds}")
-            self.root.update()
-        self.countdown_label.config(text="Go!")
-        self.root.update()
-        time.sleep(1)  # Show "Go!" for 1 second before starting the test
-        self.countdown_label.config(text="")
-        self.root.update()
-        self.running = True
-        threading.Thread(target=self.run_test).start()
+            countdown_window.destroy()  # Close the countdown window
+            self.running = True
+            threading.Thread(target=self.run_test).start()
+
+        # Start countdown update in a separate thread
+        threading.Thread(target=update_countdown).start()
 
     def stop_test(self):
         self.running = False
@@ -186,13 +196,13 @@ class MSFTApp:
         pygame.mixer.music.load("beep.mp3")
         pygame.mixer.music.play()
 
-    def update_timer(self, time_per_shuttle):
-        end_time = time.time() + time_per_shuttle
-        while time.time() < end_time and self.running:
-            remaining_time = max(end_time - time.time(), 0)
-            self.timer_label.config(text=f"Time: {remaining_time:.3f} s")  # Show up to 3 decimal places
+    def update_timer(self, duration):
+        start_time = time.time()
+        while self.running and (time.time() - start_time) < duration:
+            remaining_time = duration - (time.time() - start_time)
+            self.timer_label.config(text=f"Time: {remaining_time:.3f} s")
             self.root.update()
-        self.timer_label.config(text="Time: 0.000 s")  # Show exact time when stopped
+        self.timer_label.config(text="Time: 0.000 s")
 
     def update_info(self):
         self.info_label.config(text=f"Level: {self.level} Shuttle: {self.shuttle} Speed: {self.speed:.1f} km/h")
