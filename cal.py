@@ -152,7 +152,7 @@ class MSFTApp:
         # Calculator Menu
         self.calculator_menu = tk.Menu(self.menu_bar, tearoff=0)
         self.menu_bar.add_cascade(label="Tools", menu=self.calculator_menu)
-        self.calculator_menu.add_command(label="Vo2max Calculator", command=self.update_protocol)
+        self.calculator_menu.add_command(label="Vo2max Calculator", command=self.BeepTestCalculator)
 
          # Contact Developer Menu
         self.contact_menu = tk.Menu(self.menu_bar, tearoff=0)
@@ -166,6 +166,110 @@ class MSFTApp:
 
         # Exit Menu
         self.menu_bar.add_command(label="Exit", command=root.quit)
+
+    def BeepTestCalculator(self):
+        # Create a popup window for the Beep Test Calculator
+        calculator_window = tk.Toplevel(self.root)
+        calculator_window.title("VO2max Calculator")
+        calculator_window.geometry("400x450")
+        calculator_window.configure(bg="#2C2F33")
+
+        label = tk.Label(calculator_window, text="VO2max Calculator", font=("Arial", 16, "bold"), bg="#2C2F33", fg="#FFFFFF")
+        label.pack(pady=15)
+
+        # Frame for input fields
+        input_frame = tk.Frame(calculator_window, bg="#2C2F33")
+        input_frame.pack(pady=10)
+
+        # Age input
+        age_label = tk.Label(input_frame, text="Age:", font=("Arial", 12), bg="#2C2F33", fg="#FFFFFF")
+        age_label.grid(row=0, column=0, sticky="e", padx=5, pady=5)
+        age_entry = tk.Entry(input_frame, font=("Arial", 12), width=10)
+        age_entry.grid(row=0, column=1, padx=5, pady=5)
+
+        # Sex input
+        sex_label = tk.Label(input_frame, text="Sex:", font=("Arial", 12), bg="#2C2F33", fg="#FFFFFF")
+        sex_label.grid(row=1, column=0, sticky="e", padx=5, pady=5)
+    
+        sex_var = tk.StringVar(value="Male")
+        sex_frame = tk.Frame(input_frame, bg="#2C2F33")
+        sex_frame.grid(row=1, column=1, padx=5, pady=5)
+        male_radio = tk.Radiobutton(sex_frame, text="Male", variable=sex_var, value="Male", font=("Arial", 12), bg="#2C2F33", fg="#FFFFFF", selectcolor="#2C2F33")
+        female_radio = tk.Radiobutton(sex_frame, text="Female", variable=sex_var, value="Female", font=("Arial", 12), bg="#2C2F33", fg="#FFFFFF", selectcolor="#2C2F33")
+        male_radio.grid(row=0, column=0)
+        female_radio.grid(row=0, column=1)
+
+        # Level input
+        level_label = tk.Label(input_frame, text="Level (1-21):", font=("Arial", 12), bg="#2C2F33", fg="#FFFFFF")
+        level_label.grid(row=2, column=0, sticky="e", padx=5, pady=5)
+        level_entry = tk.Entry(input_frame, font=("Arial", 12), width=10)
+        level_entry.grid(row=2, column=1, padx=5, pady=5)
+
+        # Shuttle input
+        shuttle_label = tk.Label(input_frame, text="Shuttles (0-16):", font=("Arial", 12), bg="#2C2F33", fg="#FFFFFF")
+        shuttle_label.grid(row=3, column=0, sticky="e", padx=5, pady=5)
+        shuttle_entry = tk.Entry(input_frame, font=("Arial", 12), width=10)
+        shuttle_entry.grid(row=3, column=1, padx=5, pady=5)
+
+        # Calculate VO2max button
+        calculate_button = tk.Button(calculator_window, text="Calculate VO2max", font=("Arial", 14, "bold"), 
+                                    command=lambda: self.calculate_vo2max(calculator_window, age_entry.get(), 
+                                                                        sex_var.get(), level_entry.get(), 
+                                                                        shuttle_entry.get()), 
+                                 bg="#7289DA", fg="#FFFFFF", relief=tk.FLAT)
+        calculate_button.pack(pady=20, ipadx=10, ipady=5)
+
+        # Result display
+        result_label = tk.Label(calculator_window, text="Your VO2max (ml/kg/min):", font=("Arial", 12, "bold"), bg="#2C2F33", fg="#FFFFFF")
+        result_label.pack(pady=5)
+        self.result_var = tk.StringVar(value="--")
+        result_display = tk.Label(calculator_window, textvariable=self.result_var, font=("Arial", 14), bg="#2C2F33", fg="#7289DA")
+        result_display.pack(pady=5)
+
+        # Rating display
+        rating_label = tk.Label(calculator_window, text="Rating:", font=("Arial", 12, "bold"), bg="#2C2F33", fg="#FFFFFF")
+        rating_label.pack(pady=5)
+        self.rating_var = tk.StringVar(value="--")
+        rating_display = tk.Label(calculator_window, textvariable=self.rating_var, font=("Arial", 14), bg="#2C2F33", fg="#7289DA")
+        rating_display.pack(pady=5)
+
+
+    def calculate_vo2max(self, window, age, sex, level, shuttles):
+        try:
+            # Convert inputs to integers
+            age = int(age)
+            level = int(level)
+            shuttles = int(shuttles)
+
+            # Validate inputs
+            if not (1 <= level <= 21):
+                raise ValueError("Level out of range.")
+
+            # Calculate the sex factor
+            sex_factor = 1 if sex == "Male" else 0
+
+            # VO2max calculation using Léger et al. (1988) formula
+            vo2max = 31.025 + (3.238 * level) - (0.156 * age) - (0.646 * sex_factor)
+
+            # Display the result
+            self.result_var.set(f"{vo2max:.2f}")
+
+            # Determine rating based on VO2max value (example rating system)
+            if vo2max > 60:
+                rating = "Excellent"
+            elif vo2max > 50:
+                rating = "Good"
+            elif vo2max > 40:
+                rating = "Average"
+            else:
+                rating = "Below Average"
+        
+            self.rating_var.set(rating)
+
+        except ValueError as e:
+            # Handle input errors
+            self.result_var.set("Error")
+            self.rating_var.set("Invalid input, please check values.")
 
     def show_how_to_use(self):
     # Create a popup window to display instructions in Thai
