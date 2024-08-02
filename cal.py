@@ -272,20 +272,36 @@ class MSFTApp:
             self.rating_var.set("Invalid input, please check values.")
 
     def show_how_to_use(self):
-    # Create a popup window to display instructions in Thai
+        # Create a popup window to display instructions in Thai
         how_to_use_window = tk.Toplevel(self.root)
         how_to_use_window.title("How to Use")
-        how_to_use_window.geometry("400x300")
+        how_to_use_window.geometry("520x420")
         how_to_use_window.configure(bg="#333333")
+
+        #Add image
+        image = Image.open("book.png")  # Replace with your image file
+        image = image.resize((100, 100), Image.LANCZOS)  # Resize the image if needed
+        photo = ImageTk.PhotoImage(image)
+
+        # Display the developer's profile picture at the top
+        image_label = tk.Label(how_to_use_window, image=photo, bg="#333333")
+        image_label.image = photo  # Keep a reference to avoid garbage collection
+        image_label.pack(pady=10)
 
         label = tk.Label(how_to_use_window, text="วิธีการใช้งาน (Thai Version)", font=("Arial", 14), bg="#333333", fg="#FFFFFF")
         label.pack(pady=10)
 
         instructions = ("1. เริ่มการทดสอบโดยการคลิกปุ่ม 'Start Test'\n"
                     "2. ทำตามคำแนะนำที่ปรากฏบนหน้าจอ\n"
-                    "3. คลิกปุ่ม 'Complete' เมื่อผู้เล่นทำการทดสอบเสร็จสิ้น\n"
+                    "3. คลิกปุ่ม 'Complete' เมื่อผู้เล่นวิ่งไม่ทันเสียงสัญาณ\n"
                     "4. ข้อมูลผลลัพธ์จะถูกแสดงที่ด้านขวาของแผงผู้เล่น\n"
-                    "5. ใช้ปุ่ม 'Stop Test' เพื่อหยุดการทดสอบ")
+                    "5. ใช้ปุ่ม 'Stop Test' เพื่อหยุดการทดสอบ\n"
+                    "6. คลิกที่เมนู 'Tools' เพื่อคํานวณค่า Vo2max\n"
+                    "7. คลิกที่เมนู 'Developer' เพื่อติดต่อผู้พัฒนา\n"
+                    "8. คลิกที่เมนู 'Help' เพื่อดูคำแนะนำการใช้งานเพิ่มเติม\n"
+                    "9. คลิกที่เมนู 'Exit' เพื่อออกจากโปรแกรม\n"
+                    "10. โปรแกรมนี้ไม่สามารถใช้เพื่อการค้าได้ ใช้เพื่อการศึกษาเท่านั้น\n\n"
+                    "หมายเหตุ: โปรแกรมคํานวณค่า Vo2max จะใช้สูตรของ Léger et al. (1988)")
         instructions_label = tk.Label(how_to_use_window, text=instructions, font=("Arial", 12), bg="#333333", fg="#FFFFFF", justify=tk.LEFT)
         instructions_label.pack(pady=10)
 
@@ -306,16 +322,13 @@ class MSFTApp:
         image_label.image = photo  # Keep a reference to avoid garbage collection
         image_label.pack(pady=10)
 
-        label = tk.Label(contact_window, text="Developer Information!", font=("Arial", 14), bg="#333333", fg="#FFFFFF")
+        label = tk.Label(contact_window, text="Mr.Patchara Al-umaree", font=("Arial", 14), bg="#333333", fg="#FFFFFF")
         label.pack(pady=10)
 
-        contact_info = "Mr.Patchara Al-umaree \n\n Email: Patcharaalumaree@gmail.com \n GitHub: https://github.com/MrPatchara\n Phone: +66-96-061-4238"
+        contact_info = "Email: Patcharaalumaree@gmail.com \n GitHub: https://github.com/MrPatchara\n Phone: +66-96-061-4238 \n\n This program is not for commercial use."
         contact_label = tk.Label(contact_window, text=contact_info, font=("Arial", 12), bg="#333333", fg="#FFFFFF")
         contact_label.pack(pady=10)
 
-        contact_info ="Mr.Patchara Al-umaree \n\n Email: Patcharaalumaree@gmail.com \n GitHub: https://github.com/MrPatchara\n Phone: +66-96-061-4238"
-        contact_label = tk.Label(contact_window, text=contact_info, font=("Arial", 12), bg="#333333", fg="#FFFFFF")
-        contact_label.pack(pady=10)
 
 
     def update_protocol(self):
@@ -382,7 +395,7 @@ class MSFTApp:
             self.update_info()
 
     def play_beep(self):
-        pygame.mixer.music.load("bruh.mp3")
+        pygame.mixer.music.load("beep.mp3")
         pygame.mixer.music.play()
 
     def update_timer(self, duration):
