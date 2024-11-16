@@ -74,7 +74,9 @@ class MSFTApp:
     def __init__(self, root):
         self.root = root
         self.root.title("THE MULTI-STAGE FITNESS TEST")
-        self.root.configure(bg="#333333")
+        self.root.configure(bg="#333333") 
+        # picture program
+        self.root.iconbitmap("icon.ico")
 
         # Initialize attributes
         self.level = 1
